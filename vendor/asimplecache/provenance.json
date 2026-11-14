@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/yangfuhai/ASimpleCache",
+  "commit": "7935b04751aa57299cfb8b89e5b1e12a2d96e7cb",
+  "source_url": "https://github.com/yangfuhai/ASimpleCache/blob/7935b04751aa57299cfb8b89e5b1e12a2d96e7cb/source/src/org/afinal/simplecache/ACache.java",
+  "source_sha256": "6c42d895d937d9f2174b95f1c698f45121ed0d4a5fdb223568ecd2ce72808b4b",
+  "license": "Apache-2.0",
+  "modifications": false,
+  "original_apk_input": false
+}

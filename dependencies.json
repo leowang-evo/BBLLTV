@@ -1,0 +1,524 @@
+{
+  "schema": 1,
+  "boundary": "Only published upstream JAR/AAR artifacts are program dependencies. No original APK DEX, native libraries, or reconstructed compiler headers are permitted.",
+  "artifacts": [
+    {
+      "scope": "domain",
+      "coordinate": "com.google.code.gson:gson:2.10.1",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Original Gson diagnostic strings explicitly name 2.10.1; source com/google/gson/i.java lines227/280/335."
+    },
+    {
+      "scope": "domain",
+      "coordinate": "com.google.protobuf:protobuf-javalite:3.25.5",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate selected for recovered GeneratedMessageLite models; original exact protobuf version is not established."
+    },
+    {
+      "scope": "domain",
+      "coordinate": "com.google.protobuf:protobuf-kotlin-lite:3.25.5",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate aligned with protobuf-javalite; original exact version is not established."
+    },
+    {
+      "scope": "domain",
+      "coordinate": "org.jetbrains.kotlin:kotlin-stdlib:1.9.24",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate including kotlin.enums.EnumEntries; original Kotlin version is not established."
+    },
+    {
+      "scope": "domain",
+      "coordinate": "org.jetbrains:annotations:13.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Published kotlin-stdlib dependency; included as upstream annotations only."
+    },
+    {
+      "scope": "network",
+      "coordinate": "com.squareup.retrofit2:retrofit:2.11.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate; recovered annotation parser supports Headers.allowUnsafeNonAsciiValues, so 2.9.0 is not assumed sufficient."
+    },
+    {
+      "scope": "network",
+      "coordinate": "com.squareup.retrofit2:converter-gson:2.11.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official converter matching the chosen Retrofit compatibility version."
+    },
+    {
+      "scope": "network",
+      "coordinate": "com.squareup.okhttp3:okhttp:4.12.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Exact original version string okhttp/4.12.0 at java-export/okhttp3/internal/connection/m.java:272."
+    },
+    {
+      "scope": "network",
+      "coordinate": "com.squareup.okio:okio-jvm:3.6.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Published OkHttp4.12.0 dependency; upstream POM evidence retained."
+    },
+    {
+      "scope": "network",
+      "coordinate": "org.brotli:dec:0.1.2",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate for pure-Java Brotli decoder; original exact version not established."
+    },
+    {
+      "scope": "network",
+      "coordinate": "com.squareup.retrofit2:converter-scalars:2.11.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official String/scalar converter matching Retrofit candidate2.11.0."
+    },
+    {
+      "scope": "network",
+      "coordinate": "com.squareup.retrofit2:converter-protobuf:2.11.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official protobuf converter matching Retrofit candidate2.11.0; only MessageLite APIs will be validated against javalite to avoid protobuf-java duplication.",
+      "exclude_transitive": [
+        "com.google.protobuf:protobuf-java"
+      ]
+    },
+    {
+      "scope": "network",
+      "coordinate": "com.squareup.okhttp3:logging-interceptor:4.12.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official optional logging interceptor aligned with original confirmed OkHttp4.12.0."
+    },
+    {
+      "scope": "network",
+      "coordinate": "net.sf.kxml:kxml2:2.3.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Published pure-Java XMLPull parser implementation candidate; verify whether org.xmlpull.v1 interfaces are bundled before choosing Android packaging exclusions."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.recyclerview:recyclerview:1.3.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.constraintlayout:constraintlayout:2.2.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "com.google.android.material:material:1.12.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.appcompat:appcompat:1.7.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.appcompat:appcompat-resources:1.7.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.core:core:1.15.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.core:core-ktx:1.15.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.activity:activity:1.9.2",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.activity:activity-ktx:1.9.2",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.fragment:fragment:1.8.3",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.fragment:fragment-ktx:1.8.3",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.preference:preference:1.2.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.preference:preference-ktx:1.2.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.viewpager:viewpager:1.0.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.viewpager2:viewpager2:1.0.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.lifecycle:lifecycle-livedata:2.8.5",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.lifecycle:lifecycle-livedata-core:2.8.5",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.lifecycle:lifecycle-viewmodel-android:2.8.5",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Actual Android AAR variant of exact original logical component version2.8.5; base module is an empty multiplatform redirect AAR."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.lifecycle:lifecycle-runtime-android:2.8.5",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Actual Android AAR variant of exact original logical component version2.8.5; base module is an empty multiplatform redirect AAR."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.savedstate:savedstate:1.2.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Exact component version retained in original APK META-INF AndroidX/Material .version file."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-common:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-exoplayer:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-exoplayer-dash:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-exoplayer-hls:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-ui:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-datasource:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-datasource-okhttp:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-extractor:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-container:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-decoder:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.media3:media3-database:1.4.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Compatibility candidate for observed Media3 packages; original exact Media3 version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.leanback:leanback:1.2.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published support component candidate; exact version is only asserted when matched to original META-INF version metadata."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published support component candidate; exact version is only asserted when matched to original META-INF version metadata."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.multidex:multidex:2.0.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published support component candidate; exact version is only asserted when matched to original META-INF version metadata."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.customview:customview:1.1.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published support component candidate; exact version is only asserted when matched to original META-INF version metadata."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.coordinatorlayout:coordinatorlayout:1.1.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published support component candidate; exact version is only asserted when matched to original META-INF version metadata."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.drawerlayout:drawerlayout:1.1.1",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published support component candidate; exact version is only asserted when matched to original META-INF version metadata."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.cardview:cardview:1.0.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published support component candidate; exact version is only asserted when matched to original META-INF version metadata."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.transition:transition:1.5.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published support component candidate; exact version is only asserted when matched to original META-INF version metadata."
+    },
+    {
+      "scope": "android",
+      "coordinate": "androidx.annotation:annotation-jvm:1.8.1",
+      "packaging": "jar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published support component candidate; exact version is only asserted when matched to original META-INF version metadata."
+    },
+    {
+      "scope": "android",
+      "coordinate": "com.github.bumptech.glide:glide:4.16.0",
+      "packaging": "aar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate for observed Glide package; exact original version unknown."
+    },
+    {
+      "scope": "android",
+      "coordinate": "com.kuaishou:akdanmaku:1.0.3",
+      "packaging": "aar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official KwaiAppTeam/AkDanmaku Guide.md publishes this coordinate; exact original artifact version is not established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "io.insert-koin:koin-android:3.5.3",
+      "packaging": "aar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate for observed org.koin Android SDK package."
+    },
+    {
+      "scope": "android",
+      "coordinate": "io.insert-koin:koin-core-jvm:3.5.3",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official JVM core aligned with selected koin-android."
+    },
+    {
+      "scope": "android",
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.7.3",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Exact 1.7.3 retained in original kotlinx_coroutines_core.version."
+    },
+    {
+      "scope": "android",
+      "coordinate": "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Exact 1.7.3 retained in original kotlinx_coroutines_android.version."
+    },
+    {
+      "scope": "android",
+      "coordinate": "io.reactivex.rxjava2:rxjava:2.2.21",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate for observed io.reactivex v2 packages."
+    },
+    {
+      "scope": "android",
+      "coordinate": "io.reactivex.rxjava2:rxandroid:2.1.1",
+      "packaging": "aar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate aligned with RxJava2."
+    },
+    {
+      "scope": "android",
+      "coordinate": "org.reactivestreams:reactive-streams:1.0.3",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Published RxJava2 dependency."
+    },
+    {
+      "scope": "android",
+      "coordinate": "com.google.zxing:core:3.5.3",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Compatibility candidate for QR encoder/decoder SDK replacement."
+    },
+    {
+      "scope": "android",
+      "coordinate": "com.badlogicgames.gdx:gdx:1.10.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Exact dependency coordinate specified by official published com.kuaishou:akdanmaku:1.0.3 POM; original APK exact version is not separately established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "com.badlogicgames.gdx:gdx-backend-android:1.10.0",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Exact dependency coordinate specified by official published com.kuaishou:akdanmaku:1.0.3 POM; original APK exact version is not separately established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "com.badlogicgames.ashley:ashley:1.7.3",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Exact dependency coordinate specified by official published com.kuaishou:akdanmaku:1.0.3 POM; original APK exact version is not separately established."
+    },
+    {
+      "scope": "android",
+      "coordinate": "com.github.franmontiel:PersistentCookieJar:v1.0.1",
+      "packaging": "aar",
+      "repository": "https://jitpack.io",
+      "version_evidence": "Official Git tag v1.0.1 pinned at4864cd27ecdb625b7a4eec24221ccaaff2a3007b; published JitPack v1.0.1 AAR. Apache-2.0. Original tag README documents the JitPack coordinate family with older v1.0.0 example, not an exact-version claim."
+    },
+    {
+      "scope": "android",
+      "coordinate": "com.google.android.flexbox:flexbox:3.0.0",
+      "packaging": "aar",
+      "repository": "https://dl.google.com/dl/android/maven2",
+      "version_evidence": "Published external dependency required by recovered application FlexboxLayout view references. Original exact library version not separately established."
+    },
+    {
+      "scope": "natives",
+      "coordinate": "com.badlogicgames.gdx:gdx-platform:1.10.0",
+      "classifier": "natives-armeabi-v7a",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official libGDX1.10.0 native artifact. Selected AkDanmaku1.0.3 POM pins gdx1.10.0; compare published AAR JNI bytes and symbol ABI, never use original APK libraries."
+    },
+    {
+      "scope": "natives",
+      "coordinate": "com.badlogicgames.gdx:gdx-platform:1.10.0",
+      "classifier": "natives-arm64-v8a",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official libGDX1.10.0 native artifact. Selected AkDanmaku1.0.3 POM pins gdx1.10.0; compare published AAR JNI bytes and symbol ABI, never use original APK libraries."
+    },
+    {
+      "scope": "natives",
+      "coordinate": "com.badlogicgames.gdx:gdx-platform:1.10.0",
+      "classifier": "natives-x86",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official libGDX1.10.0 native artifact. Selected AkDanmaku1.0.3 POM pins gdx1.10.0; compare published AAR JNI bytes and symbol ABI, never use original APK libraries."
+    },
+    {
+      "scope": "natives",
+      "coordinate": "com.badlogicgames.gdx:gdx-platform:1.10.0",
+      "classifier": "natives-x86_64",
+      "packaging": "jar",
+      "repository": "https://repo.maven.apache.org/maven2",
+      "version_evidence": "Official libGDX1.10.0 native artifact. Selected AkDanmaku1.0.3 POM pins gdx1.10.0; compare published AAR JNI bytes and symbol ABI, never use original APK libraries."
+    }
+  ]
+}

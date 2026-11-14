@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat android:gravity="center_vertical" android:orientation="horizontal" android:id="@id/click_view" android:background="@drawable/list_background" android:focusable="true" android:clickable="true" android:layout_width="match_parent" android:layout_height="wrap_content"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <View android:id="@id/indicator" android:background="?colorAccent" android:layout_width="@dimen/px7" android:layout_height="@dimen/px80" app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent" />
+    <androidx.appcompat.widget.AppCompatImageView android:id="@id/image_avatar" android:layout_width="@dimen/px50" android:layout_height="@dimen/px50" android:layout_marginLeft="@dimen/px13" android:layout_marginTop="@dimen/px15" android:layout_marginBottom="@dimen/px15" android:layout_marginStart="@dimen/px13" app:srcCompat="@mipmap/default_avatar" />
+    <androidx.appcompat.widget.AppCompatTextView android:textSize="@dimen/px29" android:textStyle="bold" android:textColor="?android:textColorPrimary" android:ellipsize="marquee" android:id="@id/text_name" android:layout_width="0.0dp" android:layout_height="wrap_content" android:text="Title" android:singleLine="true" android:layout_weight="1.0" android:layout_marginStart="@dimen/px15" android:layout_marginEnd="@dimen/px20" />
+</androidx.appcompat.widget.LinearLayoutCompat>

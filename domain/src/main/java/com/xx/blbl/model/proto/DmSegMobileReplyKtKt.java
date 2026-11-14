@@ -1,0 +1,28 @@
+package com.xx.blbl.model.proto;
+
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.internal.Intrinsics;
+
+/* JADX INFO: loaded from: classes.dex */
+public final class DmSegMobileReplyKtKt {
+    public static final /* synthetic */ Dm.DmSegMobileReply copy(Dm.DmSegMobileReply dmSegMobileReply, Function1 block) {
+        Intrinsics.checkNotNullParameter(dmSegMobileReply, "<this>");
+        Intrinsics.checkNotNullParameter(block, "block");
+        DmSegMobileReplyKt.Dsl.Companion companion = DmSegMobileReplyKt.Dsl.Companion;
+        Dm.DmSegMobileReply.Builder builder = dmSegMobileReply.toBuilder();
+        Intrinsics.checkNotNullExpressionValue(builder, "toBuilder(...)");
+        DmSegMobileReplyKt.Dsl dsl_create = companion._create(builder);
+        block.invoke(dsl_create);
+        return dsl_create._build();
+    }
+
+    public static final /* synthetic */ Dm.DmSegMobileReply dmSegMobileReply(Function1 block) {
+        Intrinsics.checkNotNullParameter(block, "block");
+        DmSegMobileReplyKt.Dsl.Companion companion = DmSegMobileReplyKt.Dsl.Companion;
+        Dm.DmSegMobileReply.Builder builderNewBuilder = Dm.DmSegMobileReply.newBuilder();
+        Intrinsics.checkNotNullExpressionValue(builderNewBuilder, "newBuilder(...)");
+        DmSegMobileReplyKt.Dsl dsl_create = companion._create(builderNewBuilder);
+        block.invoke(dsl_create);
+        return dsl_create._build();
+    }
+}

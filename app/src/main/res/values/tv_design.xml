@@ -1,0 +1,7 @@
+<resources>
+ <dimen name="tv_nav_width">132px</dimen><dimen name="tv_panel_width">560px</dimen>
+ <color name="tv_panel">#F2161C29</color><color name="tv_muted">#ACB7CC</color>
+ <style name="TvHomeTab" parent="TopPageTabText"><item name="android:textSize">32px</item><item name="android:textStyle">normal</item></style>
+ <string name="tv_play_from_start">从头播放</string>
+ <string name="tv_resumed_position">已从上次观看位置继续播放</string>
+</resources>

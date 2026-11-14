@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge android:layout_width="match_parent" android:layout_height="match_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.appcompat.widget.AppCompatImageView android:layout_width="@dimen/px180" android:layout_height="@dimen/px180" android:background="@drawable/bblltv_about_icon_mask" android:clipToOutline="true" app:srcCompat="@mipmap/bblltv_icon_artwork" />
+    <androidx.appcompat.widget.AppCompatTextView android:textSize="@dimen/px35" android:textStyle="bold" android:textColor="?android:textColorPrimary" android:id="@id/text_app_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="@dimen/px25" android:text="@string/about_name" />
+    <androidx.appcompat.widget.AppCompatTextView android:textSize="@dimen/px30" android:textColor="?android:textColorSecondary" android:id="@id/text_desc" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="@dimen/px25" android:lineSpacingExtra="@dimen/px5" android:text="@string/about_desc" android:paddingStart="@dimen/px60" android:paddingEnd="@dimen/px60" />
+</merge>

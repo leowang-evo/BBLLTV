@@ -1,0 +1,15 @@
+.gradle/
+.gradle-user-home/
+.tmp/
+dependencies/
+**/build/
+resource-build/
+# Local APKs, device screenshots and validation reports may contain account data.
+/dist/
+local.properties
+keys/*
+!keys/README.txt
+*.log
+.DS_Store
+__pycache__/
+*.pyc

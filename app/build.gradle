@@ -1,0 +1,185 @@
+plugins { id 'com.android.application' }
+
+def standaloneApplicationId = providers.gradleProperty('validationApplicationId').getOrElse('com.damon.bblab.standalone')
+def standaloneVersionCode = providers.gradleProperty('validationVersionCode').map { Integer.parseInt(it) }.getOrElse(1)
+// Keep an existing local validation installation upgradeable without publishing its key.
+// A fresh checkout uses AGP's automatically generated per-machine debug keystore.
+def localValidationKeystore = rootProject.file('keys/reconstruction-debug.keystore')
+if (standaloneApplicationId == 'com.damon.bblab' && standaloneVersionCode < 128) {
+    throw new GradleException('Validation package upgrades require -PvalidationVersionCode=128 or higher')
+}
+
+android {
+    namespace = 'com.xx.blbl'
+    compileSdk = 36
+    defaultConfig {
+        applicationId = standaloneApplicationId
+        minSdk = 21
+        targetSdk = 35
+        versionCode = standaloneVersionCode
+        versionName = '0.2-tv-refactor'
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    buildFeatures { buildConfig = false }
+    signingConfigs {
+        debug {
+            if (localValidationKeystore.isFile()) {
+                storeFile = localValidationKeystore
+                storePassword = 'android'
+                keyAlias = 'androiddebugkey'
+                keyPassword = 'android'
+            }
+        }
+    }
+    buildTypes {
+        benchmark {
+            initWith release
+            debuggable false
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
+        }
+    }
+    androidResources {
+        additionalParameters += ['--stable-ids', layout.buildDirectory.file('generated/standalone-stable-ids.txt').get().asFile.absolutePath]
+    }
+    sourceSets {
+        main { res.setSrcDirs([layout.buildDirectory.dir('generated/standalone-res')]) }
+    }
+}
+
+def publishedResourceAars = providers.provider {
+    configurations.getByName('debugCompileClasspath').incoming.artifactView {
+        componentFilter { it instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier }
+        attributes { attribute(org.gradle.api.artifacts.type.ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE, 'aar') }
+        lenient = true
+    }.files.files.findAll { it.name.endsWith('.aar') }.sort { it.absolutePath }
+}
+def prepareStandaloneResources = tasks.register('prepareStandaloneResources', Exec) {
+    inputs.dir('src/main/res')
+    inputs.files(publishedResourceAars).withPropertyName('publishedAarResources')
+    outputs.dir(layout.buildDirectory.dir('generated/standalone-res'))
+    doFirst {
+        def aarFiles = publishedResourceAars.get().collect { it.absolutePath }
+        def listFile = layout.buildDirectory.file('upstream-resource-aars.json').get().asFile
+        listFile.parentFile.mkdirs()
+        listFile.text = groovy.json.JsonOutput.toJson(aarFiles)
+        commandLine 'python3', rootProject.file('tools/project_resource_overlay.py'), listFile,
+                layout.buildDirectory.dir('generated/standalone-res').get().asFile
+    }
+}
+tasks.named('preBuild').configure { dependsOn prepareStandaloneResources }
+def prepareStandaloneStableIds = tasks.register('prepareStandaloneStableIds', Exec) {
+    inputs.file('src/main/res/values/public.xml')
+    inputs.property('applicationId', standaloneApplicationId)
+    outputs.file(layout.buildDirectory.file('generated/standalone-stable-ids.txt'))
+    commandLine 'python3', rootProject.file('tools/write_stable_resource_ids.py'), standaloneApplicationId,
+            layout.buildDirectory.file('generated/standalone-stable-ids.txt').get().asFile
+}
+tasks.named('preBuild').configure { dependsOn prepareStandaloneStableIds }
+
+tasks.register('exportDebugCompileClasspath') {
+    dependsOn ':domain:jar', ':network:jar', ':asimplecache:bundleLibCompileToJarDebug', 'processDebugResources'
+    doLast {
+        def compileTask = tasks.named('compileDebugJavaWithJavac').get()
+        def paths = (compileTask.classpath.files + androidComponents.sdkComponents.bootClasspath.get().collect { it.asFile })
+                .findAll { it.exists() }.collect { it.absolutePath }.unique().sort()
+        def output = layout.buildDirectory.file('debug-classpath.txt').get().asFile
+        output.parentFile.mkdirs()
+        output.text = paths.join(File.pathSeparator) + '\n'
+        layout.buildDirectory.file('debug-classpath-files.json').get().asFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(paths))
+        println "Published debug compile classpath exported: ${paths.size()} files -> ${output}"
+    }
+}
+
+dependencies {
+    implementation project(':domain')
+    implementation project(':asimplecache')
+    implementation(project(':network')) {
+        exclude group: 'net.sf.kxml', module: 'kxml2'
+    }
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.core:core-ktx:1.15.0'
+    implementation 'androidx.activity:activity:1.9.2'
+    implementation 'androidx.fragment:fragment:1.8.3'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
+    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.viewpager2:viewpager2:1.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.8.5'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.5'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.media3:media3-common:1.4.1'
+    implementation 'androidx.media3:media3-exoplayer:1.4.1'
+    implementation 'androidx.media3:media3-exoplayer-dash:1.4.1'
+    implementation 'androidx.media3:media3-exoplayer-hls:1.4.1'
+    implementation 'androidx.media3:media3-ui:1.4.1'
+    implementation 'androidx.media3:media3-datasource-okhttp:1.4.1'
+    implementation 'androidx.leanback:leanback:1.2.0'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    implementation 'com.kuaishou:akdanmaku:1.0.3'
+    implementation 'io.insert-koin:koin-android:3.5.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
+    implementation('com.github.franmontiel:PersistentCookieJar:v1.0.1') {
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+    }
+}
+
+def auditVariant = providers.gradleProperty('auditVariant').getOrElse('debug')
+if (!(auditVariant in ['debug', 'benchmark'])) throw new GradleException('Unsupported audit variant')
+def auditCap = auditVariant.capitalize()
+
+// Records actual normal AGP inputs; no reconstructed declaration headers are allowed.
+tasks.register('exportStandaloneBuildAudit') {
+    dependsOn "assemble${auditCap}"
+    doLast {
+        def sha256 = { File file ->
+            def digest = java.security.MessageDigest.getInstance('SHA-256')
+            file.withInputStream { stream ->
+                byte[] buffer = new byte[65536]
+                int count
+                while ((count = stream.read(buffer)) != -1) digest.update(buffer, 0, count)
+            }
+            digest.digest().encodeHex().toString()
+        }
+        def describe = { File file ->
+            [path: file.canonicalPath, directory: file.isDirectory(), bytes: file.isFile() ? file.length() : null,
+             sha256: file.isFile() ? sha256(file) : null]
+        }
+        def compiles = []
+        rootProject.allprojects.each { target ->
+            target.tasks.withType(JavaCompile).findAll { it.name == 'compileJava' || it.name == (target == project ? "compile${auditCap}JavaWithJavac" : (auditVariant == 'benchmark' ? 'compileReleaseJavaWithJavac' : 'compileDebugJavaWithJavac')) }.each { task ->
+                compiles << [task: task.path, sources: task.source.files.findAll { it.isFile() }.sort { it.absolutePath }.collect(describe),
+                    classpath: task.classpath.files.findAll { it.exists() }.sort { it.absolutePath }.collect(describe),
+                    bootstrapClasspath: (task.options.bootstrapClasspath?.files ?: []).findAll { it.exists() }.sort { it.absolutePath }.collect(describe),
+                    destination: task.destinationDirectory.get().asFile.canonicalPath]
+            }
+        }
+        def packagingTasks = ["dexBuilder${auditCap}", "mergeExtDex${auditCap}", "mergeLibDex${auditCap}", "mergeProjectDex${auditCap}", "merge${auditCap}NativeLibs", "package${auditCap}"].collect { name ->
+            def task = tasks.findByName(name)
+            task == null ? [task: name, present: false] : [task: task.path, present: true,
+                inputs: task.inputs.files.files.findAll { it.exists() }.sort { it.absolutePath }.collect(describe)]
+        }
+        def components = configurations.getByName("${auditVariant}RuntimeClasspath").incoming.resolutionResult.allComponents.collect { component ->
+            [id: component.id.displayName, module: component.id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier,
+             project: component.id instanceof org.gradle.api.artifacts.component.ProjectComponentIdentifier]
+        }.sort { it.id }
+        def report = [standaloneRoot: rootProject.projectDir.canonicalPath,
+            sdkRoot: androidComponents.sdkComponents.sdkDirectory.get().asFile.canonicalPath,
+            applicationId: standaloneApplicationId, versionCode: standaloneVersionCode, buildVariant: auditVariant,
+            compileTasks: compiles, packagingTasks: packagingTasks, runtimeComponents: components,
+            apks: fileTree(layout.buildDirectory.dir("outputs/apk/${auditVariant}")).matching { include '*.apk' }.files.collect(describe)]
+        def output = layout.buildDirectory.file('standalone-build-inputs.json').get().asFile
+        output.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(report)) + '\n'
+        println "Standalone build audit inputs exported: ${output}"
+    }
+}

@@ -1,0 +1,26 @@
+plugins { id 'java-library' }
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 8
+}
+dependencies {
+    api project(':domain')
+    api 'com.squareup.retrofit2:retrofit:2.11.0'
+    api 'com.squareup.okhttp3:okhttp:4.12.0'
+    api 'com.squareup.okio:okio-jvm:3.6.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.11.0'
+    implementation('com.squareup.retrofit2:converter-protobuf:2.11.0') {
+        exclude group: 'com.google.protobuf', module: 'protobuf-java'
+    }
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+    implementation 'org.brotli:dec:0.1.2'
+    // Bundles XMLPull interfaces and implementation for pure JVM execution.
+    // The Android app excludes this artifact and uses Android's public XMLPull.
+    implementation 'net.sf.kxml:kxml2:2.3.0'
+}

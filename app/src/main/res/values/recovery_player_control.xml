@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="RecoveryPlayerControl" parent="">
+        <item name="controller_layout_id">@layout/my_player_control_view</item>
+    </style>
+</resources>

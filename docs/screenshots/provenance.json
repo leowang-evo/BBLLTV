@@ -1,0 +1,98 @@
+{
+  "readme_gallery_count": 9,
+  "capture_method": "Actual application UI; opaque ViewOverlay privacy covers were applied before fresh screenshot capture. Published files are flattened PNGs.",
+  "images": [
+    {
+      "file": "home.png",
+      "source_version": 144,
+      "sha256": "c02388457c4ebdbc858474dcdaafa84f081fcaff6c07771e7c1d90b17dd8b908",
+      "width": 1920,
+      "height": 1080,
+      "redactions": [
+        "account_avatar",
+        "account_label",
+        "continue_watching"
+      ],
+      "privacy_reviewed": true
+    },
+    {
+      "file": "category.png",
+      "source_version": 144,
+      "sha256": "698d87abbc2eeed75d8b8c2dbc98f65eb60af04066e7ef0da78f94c5e8dcbf16",
+      "width": 1920,
+      "height": 1080,
+      "redactions": [
+        "account_avatar",
+        "account_label"
+      ],
+      "privacy_reviewed": true
+    },
+    {
+      "file": "live.png",
+      "source_version": 144,
+      "sha256": "e8ffc1605f9139d8ab37900505ab6da7ec3d8e3a5a2142baea3c994be9e1f811",
+      "width": 1920,
+      "height": 1080,
+      "redactions": [
+        "account_avatar",
+        "account_label",
+        "followed_live_rooms"
+      ],
+      "privacy_reviewed": true
+    },
+    {
+      "file": "settings-play.png",
+      "source_version": 144,
+      "sha256": "7c24c48013c8038986d7e9a8d6f39d41eeb865ed81b88b9e20529a01b37bad09",
+      "width": 1920,
+      "height": 1080,
+      "redactions": [],
+      "privacy_reviewed": true
+    },
+    {
+      "file": "settings-danmaku.png",
+      "source_version": 144,
+      "sha256": "be6d3b42c3a6cd9698da5c85b7873b681534913e0c310b3a28c3c4c562f1ab85",
+      "width": 1920,
+      "height": 1080,
+      "redactions": [],
+      "privacy_reviewed": true
+    },
+    {
+      "file": "about.png",
+      "source_version": 144,
+      "sha256": "1d8b0bc5bdd2413305e857e872351a228fb7625d8084c7ae2d2ea74c59a4fce7",
+      "width": 1920,
+      "height": 1080,
+      "redactions": [],
+      "privacy_reviewed": true
+    },
+    {
+      "file": "catalog.png",
+      "source_version": 143,
+      "sha256": "7d23d84a6de3ea1ab4e37257a8f834fcfc8383e00250cd0bf5008bc17c0154bf",
+      "width": 1920,
+      "height": 1080,
+      "redactions": [],
+      "privacy_reviewed": true
+    },
+    {
+      "file": "player.png",
+      "source_version": 140,
+      "sha256": "78123b4e5a1c77649ddad375527c9be9aef8e0f81bca2891fbbaf3368102d922",
+      "width": 1920,
+      "height": 1080,
+      "redactions": [],
+      "privacy_reviewed": true
+    },
+    {
+      "file": "player-settings.png",
+      "source_version": 141,
+      "sha256": "8f63adc36ba8cf047ddbadeeb13630c59a3dd03fe8152a5afd124ea0f9643b98",
+      "width": 1920,
+      "height": 1080,
+      "redactions": [],
+      "privacy_reviewed": true
+    }
+  ]
+}

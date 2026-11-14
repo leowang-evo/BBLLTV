@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView android:textSize="@dimen/px38" android:textStyle="bold" android:textColor="?android:textColorSecondary" android:gravity="center" android:id="@id/button_key_qwe" android:background="@drawable/keyboard_selector" android:focusable="true" android:layout_width="match_parent" android:layout_height="match_parent" android:text="A"
+  xmlns:android="http://schemas.android.com/apk/res/android" />
