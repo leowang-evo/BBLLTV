@@ -17,7 +17,7 @@ android {
         minSdk = 21
         targetSdk = 35
         versionCode = standaloneVersionCode
-        versionName = '0.2-tv-refactor'
+        versionName = '0.2.145'
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

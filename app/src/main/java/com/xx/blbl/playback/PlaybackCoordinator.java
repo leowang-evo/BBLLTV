@@ -40,6 +40,7 @@ import kotlin.jvm.internal.Intrinsics;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -69,7 +70,7 @@ public final class PlaybackCoordinator {
     public boolean f12284a0;
     public VideoModel video;
     public VideoCodecEnum f12286b0;
-    public List f12287c;
+    public List<VideoPvModel> f12287c;
     public AudioQuality f12288c0;
     public UgcSeriesModel d;
     public long f12289d0;
@@ -556,6 +557,12 @@ public final class PlaybackCoordinator {
     }
 
     public final void loadVideoDetails() {
+        loadVideoDetails(this.video == null ? null : this.video.getUgc_season());
+    }
+
+    private void loadVideoDetails(UgcSeriesModel collection) {
+        this.d = collection;
+        this.f12287c = this.video == null ? null : this.video.getPages();
         VideoModel videoModel;
         String bvid;
         VideoModel videoModel2;
@@ -686,199 +693,118 @@ public final class PlaybackCoordinator {
         }
     }
 
-    public final void playNext(boolean z7) {
-        List list;
-        List listSubList;
-        AppState dVar = this.settings;
-        if (!z7 && dVar.continuationMode == ContinuationPlayEnum.Disable.getOrder()) {
+    public List<VideoPvModel> videoParts() {
+        return this.f12287c == null ? Collections.emptyList() : this.f12287c;
+    }
+
+    public List<UgcEpisodeModel> collectionEpisodes() {
+        if (this.d == null) return Collections.emptyList();
+        List<UgcSectionModel> sections = this.d.getSections();
+        if (sections == null || sections.isEmpty()) return Collections.emptyList();
+        List<UgcEpisodeModel> episodes = sections.get(0).getEpisodes();
+        return episodes == null ? Collections.emptyList() : episodes;
+    }
+
+    public List<?> episodeChoices() {
+        if (this.f12278V == 1) return this.e == null ? Collections.emptyList() : this.e;
+        if (this.f12278V != 0) return Collections.emptyList();
+        List<VideoPvModel> parts = videoParts();
+        List<UgcEpisodeModel> collection = collectionEpisodes();
+        return parts.size() > 1 || collection.isEmpty() ? parts : collection;
+    }
+
+    public int currentEpisodeIndex(List<?> entries) {
+        if (this.video == null) return -1;
+        long cid = this.video.getCid();
+        long aid = this.video.getAid();
+        String bvid = this.video.getBvid();
+        for (int index = 0; index < entries.size(); index++) {
+            Object entry = entries.get(index);
+            if (entry instanceof VideoPvModel && ((VideoPvModel) entry).getCid() == cid)
+                return index;
+            if (entry instanceof EpisodeModel && ((EpisodeModel) entry).getCid() == cid)
+                return index;
+            if (entry instanceof UgcEpisodeModel) {
+                UgcEpisodeModel episode = (UgcEpisodeModel) entry;
+                // A collection entry represents a whole video, including all of its CIDs.
+                if ((aid > 0 && episode.getAid() == aid)
+                        || (!TextUtils.isEmpty(bvid) && bvid.equals(episode.getBvid())))
+                    return index;
+            }
+        }
+        return -1;
+    }
+
+    private Object adjacentEpisode(List<?> entries, int offset) {
+        int current = currentEpisodeIndex(entries);
+        int target = current + offset;
+        return current >= 0 && target >= 0 && target < entries.size() ? entries.get(target) : null;
+    }
+
+    public Object adjacentEpisode(int offset) {
+        if (this.f12278V == 1) return adjacentEpisode(episodeChoices(), offset);
+        if (this.f12278V != 0) return null;
+        Object part = adjacentEpisode(videoParts(), offset);
+        return part != null ? part : adjacentEpisode(collectionEpisodes(), offset);
+    }
+
+    public void playEpisode(Object entry) {
+        if (this.video == null || entry == null) return;
+        this.f12289d0 = 0;
+        if (entry instanceof UgcEpisodeModel) {
+            UgcEpisodeModel episode = (UgcEpisodeModel) entry;
+            this.video = episode.getArc() == null ? new VideoModel() : episode.getArc();
+            this.video.setCid(episode.getCid());
+            this.video.setBvid(episode.getBvid());
+            this.video.setAid(episode.getAid());
+            this.video.setTitle(episode.getTitle());
+            loadVideoDetails(this.d);
+            return;
+        }
+        if (entry instanceof EpisodeModel) {
+            EpisodeModel episode = (EpisodeModel) entry;
+            this.video.setCid(episode.getCid());
+            this.video.setBvid(episode.getBvid());
+            this.video.setAid(episode.getAid());
+            this.video.setEpid(episode.getId());
+        } else {
+            this.video.setCid(((VideoPvModel) entry).getCid());
+        }
+        PlaybackFragment player = (PlaybackFragment) this.fragmentReference.get();
+        if (player != null) player.updateEpisodeHeader();
+        loadCurrentMedia();
+    }
+
+    public final void playNext(boolean manual) {
+        int continuation = this.settings.continuationMode;
+        if (!manual && continuation == ContinuationPlayEnum.Disable.getOrder()) {
             l();
             return;
         }
-        if (this.f12306t0) {
+        if (this.f12306t0) return;
+        Object nextEpisode = adjacentEpisode(1);
+        if (nextEpisode != null) {
+            playEpisode(nextEpisode);
             return;
         }
-        int i4 = this.f12278V;
-        if (i4 == 0) {
-            UgcSeriesModel ugcSeriesModel = this.d;
-            if (ugcSeriesModel != null && ugcSeriesModel.getSections() != null) {
-                UgcSeriesModel ugcSeriesModel2 = this.d;
-                Intrinsics.checkNotNull(ugcSeriesModel2);
-                List<UgcSectionModel> sections = ugcSeriesModel2.getSections();
-                Intrinsics.checkNotNull(sections);
-                if (!sections.isEmpty()) {
-                    UgcSeriesModel ugcSeriesModel3 = this.d;
-                    Intrinsics.checkNotNull(ugcSeriesModel3);
-                    List<UgcSectionModel> sections2 = ugcSeriesModel3.getSections();
-                    Intrinsics.checkNotNull(sections2);
-                    if (sections2.get(0).getEpisodes() != null) {
-                        UgcSeriesModel ugcSeriesModel4 = this.d;
-                        Intrinsics.checkNotNull(ugcSeriesModel4);
-                        List<UgcSectionModel> sections3 = ugcSeriesModel4.getSections();
-                        Intrinsics.checkNotNull(sections3);
-                        List<UgcEpisodeModel> episodes = sections3.get(0).getEpisodes();
-                        Intrinsics.checkNotNull(episodes);
-                        if (!episodes.isEmpty()) {
-                            int i7 = this.f12280X + 1;
-                            UgcSeriesModel ugcSeriesModel5 = this.d;
-                            Intrinsics.checkNotNull(ugcSeriesModel5);
-                            List<UgcSectionModel> sections4 = ugcSeriesModel5.getSections();
-                            Intrinsics.checkNotNull(sections4);
-                            List<UgcEpisodeModel> episodes2 = sections4.get(0).getEpisodes();
-                            Intrinsics.checkNotNull(episodes2);
-                            if (i7 < episodes2.size()) {
-                                VideoModel videoModel = this.video;
-                                if (videoModel != null) {
-                                    UgcSeriesModel ugcSeriesModel6 = this.d;
-                                    Intrinsics.checkNotNull(ugcSeriesModel6);
-                                    List<UgcSectionModel> sections5 = ugcSeriesModel6.getSections();
-                                    Intrinsics.checkNotNull(sections5);
-                                    List<UgcEpisodeModel> episodes3 =
-                                            sections5.get(0).getEpisodes();
-                                    Intrinsics.checkNotNull(episodes3);
-                                    videoModel.setCid(episodes3.get(this.f12280X + 1).getCid());
-                                }
-                                VideoModel videoModel2 = this.video;
-                                if (videoModel2 != null) {
-                                    UgcSeriesModel ugcSeriesModel7 = this.d;
-                                    Intrinsics.checkNotNull(ugcSeriesModel7);
-                                    List<UgcSectionModel> sections6 = ugcSeriesModel7.getSections();
-                                    Intrinsics.checkNotNull(sections6);
-                                    List<UgcEpisodeModel> episodes4 =
-                                            sections6.get(0).getEpisodes();
-                                    Intrinsics.checkNotNull(episodes4);
-                                    videoModel2.setBvid(episodes4.get(this.f12280X + 1).getBvid());
-                                }
-                                VideoModel videoModel3 = this.video;
-                                if (videoModel3 != null) {
-                                    UgcSeriesModel ugcSeriesModel8 = this.d;
-                                    Intrinsics.checkNotNull(ugcSeriesModel8);
-                                    List<UgcSectionModel> sections7 = ugcSeriesModel8.getSections();
-                                    Intrinsics.checkNotNull(sections7);
-                                    List<UgcEpisodeModel> episodes5 =
-                                            sections7.get(0).getEpisodes();
-                                    Intrinsics.checkNotNull(episodes5);
-                                    videoModel3.setAid(episodes5.get(this.f12280X + 1).getAid());
-                                }
-                                VideoModel videoModel4 = this.video;
-                                if (videoModel4 != null) {
-                                    UgcSeriesModel ugcSeriesModel9 = this.d;
-                                    Intrinsics.checkNotNull(ugcSeriesModel9);
-                                    List<UgcSectionModel> sections8 = ugcSeriesModel9.getSections();
-                                    Intrinsics.checkNotNull(sections8);
-                                    List<UgcEpisodeModel> episodes6 =
-                                            sections8.get(0).getEpisodes();
-                                    Intrinsics.checkNotNull(episodes6);
-                                    videoModel4.setTitle(
-                                            episodes6.get(this.f12280X + 1).getTitle());
-                                }
-                                loadCurrentMedia();
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-            List list2 = this.f12287c;
-            WeakReference weakReference = this.fragmentReference;
-            if (list2 != null && !list2.isEmpty()) {
-                int i8 = this.f12280X + 1;
-                List list3 = this.f12287c;
-                Intrinsics.checkNotNull(list3);
-                if (i8 < list3.size()) {
-                    VideoModel videoModel5 = this.video;
-                    if (videoModel5 != null) {
-                        List list4 = this.f12287c;
-                        Intrinsics.checkNotNull(list4);
-                        videoModel5.setCid(((VideoPvModel) list4.get(this.f12280X + 1)).getCid());
-                    }
-                    loadCurrentMedia();
-                    PlaybackFragment uVar = (PlaybackFragment) weakReference.get();
-                    if (uVar != null) {
-                        uVar.p0();
-                        return;
-                    }
-                    return;
-                }
-            }
-            if (!z7 && dVar.continuationMode == ContinuationPlayEnum.PlayEpisode.getOrder()) {
-                l();
-                return;
-            }
-            boolean queueAllowed =
-                    z7 || dVar.continuationMode == ContinuationPlayEnum.CurrentList.getOrder();
-            boolean recommendAllowed =
-                    z7 || dVar.continuationMode == ContinuationPlayEnum.Recommend.getOrder();
-            List list5 = this.f12273Q;
-            if (queueAllowed && list5 != null && !list5.isEmpty() && this.f12282Z) {
-                List list6 = this.f12273Q;
-                Intrinsics.checkNotNull(list6);
-                this.video = (VideoModel) list6.get(0);
+        if (this.f12278V == 0) {
+            boolean queueAllowed = manual || continuation == ContinuationPlayEnum.CurrentList.getOrder();
+            boolean recommendAllowed = manual || continuation == ContinuationPlayEnum.Recommend.getOrder();
+            if (queueAllowed && this.f12273Q != null && !this.f12273Q.isEmpty() && this.f12282Z) {
+                this.video = (VideoModel) this.f12273Q.get(0);
                 loadVideoDetails();
-                PlaybackFragment uVar2 = (PlaybackFragment) weakReference.get();
-                if (uVar2 != null) {
-                    uVar2.l0(false);
-                }
-                List list7 = this.f12273Q;
-                Intrinsics.checkNotNull(list7);
-                if (list7.size() > 1) {
-                    List list8 = this.f12273Q;
-                    Intrinsics.checkNotNull(list8);
-                    List list9 = this.f12273Q;
-                    Intrinsics.checkNotNull(list9);
-                    listSubList = list8.subList(1, list9.size());
-                } else {
-                    listSubList = null;
-                }
-                this.f12273Q = listSubList;
+                PlaybackFragment player = (PlaybackFragment) this.fragmentReference.get();
+                if (player != null) player.l0(false);
+                this.f12273Q = this.f12273Q.size() > 1
+                        ? this.f12273Q.subList(1, this.f12273Q.size())
+                        : null;
                 return;
             }
-            if (!recommendAllowed) {
-                l();
-                return;
-            }
-            List list10 = this.f12272P;
-            if (list10 != null && !list10.isEmpty() && this.f12282Z) {
-                List list11 = this.f12272P;
-                Intrinsics.checkNotNull(list11);
-                this.video = (VideoModel) list11.get(0);
+            if (recommendAllowed && this.f12272P != null && !this.f12272P.isEmpty() && this.f12282Z) {
+                this.video = (VideoModel) this.f12272P.get(0);
                 loadVideoDetails();
-                PlaybackFragment uVar3 = (PlaybackFragment) weakReference.get();
-                if (uVar3 != null) {
-                    uVar3.l0(false);
-                    return;
-                }
-                return;
-            }
-        } else if (i4 == 1 && (list = this.e) != null && !list.isEmpty()) {
-            int i9 = this.f12280X + 1;
-            List list12 = this.e;
-            Intrinsics.checkNotNull(list12);
-            if (i9 < list12.size()) {
-                VideoModel videoModel6 = this.video;
-                if (videoModel6 != null) {
-                    List list13 = this.e;
-                    Intrinsics.checkNotNull(list13);
-                    videoModel6.setCid(((EpisodeModel) list13.get(this.f12280X + 1)).getCid());
-                }
-                VideoModel videoModel7 = this.video;
-                if (videoModel7 != null) {
-                    List list14 = this.e;
-                    Intrinsics.checkNotNull(list14);
-                    videoModel7.setBvid(((EpisodeModel) list14.get(this.f12280X + 1)).getBvid());
-                }
-                VideoModel videoModel8 = this.video;
-                if (videoModel8 != null) {
-                    List list15 = this.e;
-                    Intrinsics.checkNotNull(list15);
-                    videoModel8.setAid(((EpisodeModel) list15.get(this.f12280X + 1)).getAid());
-                }
-                VideoModel videoModel9 = this.video;
-                if (videoModel9 != null) {
-                    List list16 = this.e;
-                    Intrinsics.checkNotNull(list16);
-                    videoModel9.setEpid(((EpisodeModel) list16.get(this.f12280X + 1)).getId());
-                }
-                loadCurrentMedia();
+                PlaybackFragment player = (PlaybackFragment) this.fragmentReference.get();
+                if (player != null) player.l0(false);
                 return;
             }
         }

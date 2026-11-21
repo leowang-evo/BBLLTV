@@ -824,14 +824,6 @@ public final class PlaybackFragment extends Fragment
         if (q() && this.playerView != null) this.playerView.showHideSubtitleButton(show);
     }
 
-    public void o0() {
-        updateEpisodeHeader(true);
-    }
-
-    public void p0() {
-        updateEpisodeHeader(false);
-    }
-
     public void q0() {
         if (!q()) return;
         VideoModel video = this.coordinator.video;
@@ -847,46 +839,31 @@ public final class PlaybackFragment extends Fragment
                 video.getPubdate() != 0 ? video.getPubdate() : video.getPub_time());
     }
 
-    private void updateEpisodeHeader(boolean series) {
+    public void updateEpisodeHeader() {
         if (!q()) return;
-        VideoModel video = this.coordinator.video;
+        PlaybackCoordinator state = this.coordinator;
+        VideoModel video = state.video;
         if (video == null) return;
         h0(video.getTitle());
         q0();
-        List<?> entries = series ? this.coordinator.e : this.coordinator.f12287c;
-        if (!series
-                && this.coordinator.d != null
-                && this.coordinator.d.getSections() != null
-                && !this.coordinator.d.getSections().isEmpty())
-            entries = this.coordinator.d.getSections().get(0).getEpisodes();
-        if (entries != null)
-            for (int index = 0; index < entries.size(); index++) {
-                Object item = entries.get(index);
-                long cid;
-                String title;
-                if (item instanceof EpisodeModel) {
-                    EpisodeModel episode = (EpisodeModel) item;
-                    cid = episode.getCid();
-                    title =
-                            TextUtils.isEmpty(episode.getLong_title())
-                                    ? episode.getTitle()
-                                    : episode.getLong_title();
-                } else if (item instanceof UgcEpisodeModel) {
-                    UgcEpisodeModel episode = (UgcEpisodeModel) item;
-                    cid = episode.getCid();
-                    title = episode.getTitle();
-                } else {
-                    VideoPvModel episode = (VideoPvModel) item;
-                    cid = episode.getCid();
-                    title = episode.getPart();
-                }
-                if (cid == video.getCid()) {
-                    this.coordinator.f12280X = index;
-                    if (!TextUtils.isEmpty(title) && !title.equals(video.getTitle()))
-                        h0(title + " ｜ " + video.getTitle());
-                    break;
-                }
-            }
+        List<?> entries = state.episodeChoices();
+        int current = state.currentEpisodeIndex(entries);
+        state.f12280X = current;
+        if (current < 0) return;
+        Object entry = entries.get(current);
+        String title;
+        if (entry instanceof EpisodeModel) {
+            EpisodeModel episode = (EpisodeModel) entry;
+            title = TextUtils.isEmpty(episode.getLong_title())
+                    ? episode.getTitle()
+                    : episode.getLong_title();
+        } else if (entry instanceof UgcEpisodeModel) {
+            title = ((UgcEpisodeModel) entry).getTitle();
+        } else {
+            title = ((VideoPvModel) entry).getPart();
+        }
+        if (!TextUtils.isEmpty(title) && !title.equals(video.getTitle()))
+            h0(title + " ｜ " + video.getTitle());
     }
 
     private void tick() {
@@ -936,22 +913,13 @@ public final class PlaybackFragment extends Fragment
 
     private void previewNext() {
         PlaybackCoordinator state = this.coordinator;
-        Object next = null;
-        int index = state.f12280X + 1;
-        if (state.f12278V == 1 && state.e != null && index < state.e.size())
-            next = state.e.get(index);
-        else if (state.d != null
-                && state.d.getSections() != null
-                && !state.d.getSections().isEmpty()) {
-            List<UgcEpisodeModel> episodes = state.d.getSections().get(0).getEpisodes();
-            if (episodes != null && index < episodes.size()) next = episodes.get(index);
-        } else if (state.f12287c != null && index < state.f12287c.size())
-            next = state.f12287c.get(index);
-        if (next == null && state.f12282Z) {
-            List<VideoModel> list =
-                    state.f12273Q != null && !state.f12273Q.isEmpty()
-                            ? state.f12273Q
-                            : state.f12272P;
+        Object next = state.adjacentEpisode(1);
+        if (next == null && state.f12278V == 0 && state.f12282Z) {
+            List<VideoModel> list = null;
+            if (this.appState.continuationMode == ContinuationPlayEnum.CurrentList.getOrder())
+                list = state.f12273Q;
+            else if (this.appState.continuationMode == ContinuationPlayEnum.Recommend.getOrder())
+                list = state.f12272P;
             if (list != null && !list.isEmpty()) next = list.get(0);
         }
         if (next instanceof VideoModel)
@@ -1005,23 +973,10 @@ public final class PlaybackFragment extends Fragment
     }
 
     private void chooseEpisode() {
-        if (!q() || this.coordinator.video == null) return;
-        List<?> entries;
-        int mode;
-        if (this.coordinator.d != null
-                && this.coordinator.d.getSections() != null
-                && !this.coordinator.d.getSections().isEmpty()) {
-            entries = this.coordinator.d.getSections().get(0).getEpisodes();
-            mode = EpisodeListAdapter.COLLECTION;
-        } else if (this.coordinator.f12278V == 1) {
-            entries = this.coordinator.e;
-            mode = EpisodeListAdapter.SERIES;
-        } else {
-            entries = this.coordinator.f12287c;
-            mode = EpisodeListAdapter.PARTS;
-        }
-        if (entries == null || entries.isEmpty()) return;
-        final List<?> episodes = entries;
+        PlaybackCoordinator state = this.coordinator;
+        if (!q() || state.video == null) return;
+        List<?> entries = state.episodeChoices();
+        if (entries.isEmpty()) return;
         boolean resume = this.player != null && this.player.getPlayWhenReady();
         if (this.player != null) this.player.pause();
         AppCompatDialog dialog = new AppCompatDialog(requireContext(), R.style.DialogTheme);
@@ -1030,44 +985,47 @@ public final class PlaybackFragment extends Fragment
                 LayoutInflater.from(dialog.getContext())
                         .inflate(R.layout.dialog_choose_episode, null);
         dialog.setContentView(content);
-        ((TextView) content.findViewById(R.id.top_title))
-                .setText(
-                        this.coordinator.d == null
-                                ? this.coordinator.video.getTitle()
-                                : this.coordinator.d.getTitle());
         RecyclerView recycler = content.findViewById(R.id.recyclerView);
-        EpisodeListAdapter adapter = new EpisodeListAdapter(mode);
-        adapter.f10338b.addAll(episodes);
-        adapter.f10339c = this.coordinator.f12280X;
-        adapter.e =
-                (clicked, position) -> {
-                    if (position < 0 || position >= episodes.size()) return;
-                    VideoModel video = this.coordinator.video;
-                    Object item = episodes.get(position);
-                    if (item instanceof EpisodeModel) {
-                        EpisodeModel episode = (EpisodeModel) item;
-                        video.setCid(episode.getCid());
-                        video.setAid(episode.getAid());
-                        video.setBvid(episode.getBvid());
-                        video.setEpid(episode.getId());
-                    } else if (item instanceof UgcEpisodeModel) {
-                        UgcEpisodeModel episode = (UgcEpisodeModel) item;
-                        video.setCid(episode.getCid());
-                        video.setAid(episode.getAid());
-                        video.setBvid(episode.getBvid());
-                        video.setTitle(episode.getTitle());
-                    } else video.setCid(((VideoPvModel) item).getCid());
-                    this.coordinator.f12280X = position;
-                    this.coordinator.f12289d0 = 0;
-                    this.coordinator.loadCurrentMedia();
-                    dialog.dismiss();
-                };
         recycler.setLayoutManager(new GridLayoutManager(requireContext(), 2));
-        recycler.setAdapter(adapter);
-        recycler.scrollToPosition(Math.max(0, this.coordinator.f12280X));
+        List<?> alternate = entries.get(0) instanceof VideoPvModel
+                ? state.collectionEpisodes()
+                : Collections.emptyList();
         resumeAfterDialog(dialog, resume);
         dialog.show();
-        RecyclerFocus.request(recycler, Math.max(0, this.coordinator.f12280X));
+        bindEpisodeChoices(dialog, content, entries, alternate);
+    }
+
+    private void bindEpisodeChoices(
+            AppCompatDialog dialog, View content, List<?> entries, List<?> alternate) {
+        PlaybackCoordinator state = this.coordinator;
+        Object first = entries.get(0);
+        int mode = EpisodeListAdapter.PARTS;
+        if (first instanceof EpisodeModel) mode = EpisodeListAdapter.SERIES;
+        else if (first instanceof UgcEpisodeModel) mode = EpisodeListAdapter.COLLECTION;
+
+        TextView title = content.findViewById(R.id.top_title);
+        title.setText(mode == EpisodeListAdapter.COLLECTION
+                ? state.d.getTitle()
+                : state.video.getTitle());
+        TextView toggle = content.findViewById(R.id.button_more_info);
+        toggle.setVisibility(alternate.isEmpty() ? View.GONE : View.VISIBLE);
+        toggle.setText(mode == EpisodeListAdapter.COLLECTION
+                ? R.string.choose_video_part
+                : R.string.choose_collection_video);
+        toggle.setOnClickListener(v -> bindEpisodeChoices(dialog, content, alternate, entries));
+
+        RecyclerView recycler = content.findViewById(R.id.recyclerView);
+        EpisodeListAdapter adapter = new EpisodeListAdapter(mode);
+        adapter.f10338b.addAll(entries);
+        int current = state.currentEpisodeIndex(entries);
+        adapter.f10339c = current;
+        adapter.e = (clicked, position) -> {
+            if (position < 0 || position >= entries.size()) return;
+            state.playEpisode(entries.get(position));
+            dialog.dismiss();
+        };
+        recycler.setAdapter(adapter);
+        RecyclerFocus.request(recycler, Math.max(0, current));
     }
 
     private final class VideoActions implements OnVideoSettingChangeListener {
@@ -1176,32 +1134,7 @@ public final class PlaybackFragment extends Fragment
     }
 
     private void previous() {
-        PlaybackCoordinator state = this.coordinator;
-        int index = state.f12280X - 1;
-        if (index < 0 || state.video == null) return;
-        VideoModel video = state.video;
-        if (state.f12278V == 1 && state.e != null && index < state.e.size()) {
-            EpisodeModel episode = (EpisodeModel) state.e.get(index);
-            video.setCid(episode.getCid());
-            video.setBvid(episode.getBvid());
-            video.setAid(episode.getAid());
-            video.setEpid(episode.getId());
-        } else if (state.d != null
-                && state.d.getSections() != null
-                && !state.d.getSections().isEmpty()) {
-            List<UgcEpisodeModel> episodes = state.d.getSections().get(0).getEpisodes();
-            if (episodes == null || index >= episodes.size()) return;
-            UgcEpisodeModel episode = episodes.get(index);
-            video.setCid(episode.getCid());
-            video.setBvid(episode.getBvid());
-            video.setAid(episode.getAid());
-            video.setTitle(episode.getTitle());
-        } else if (state.f12287c != null && index < state.f12287c.size())
-            video.setCid(((VideoPvModel) state.f12287c.get(index)).getCid());
-        else return;
-        state.f12289d0 = 0;
-        state.loadCurrentMedia();
-        p0();
+        this.coordinator.playEpisode(this.coordinator.adjacentEpisode(-1));
     }
 
     public boolean isPlaybackActive() {

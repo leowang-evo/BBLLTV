@@ -141,7 +141,7 @@ public final class PlayerMetadataCallback implements NetResultCallback, WebSocke
         List<SubtitleInfoModel> subtitles;
         MyPlayerView myPlayerView;
         List<SubtitleModel> body;
-        List list;
+        List<VideoPvModel> list;
         switch (this.f12260a) {
             case 0:
                 BaseResponse baseResponse = (BaseResponse) obj;
@@ -265,13 +265,15 @@ public final class PlayerMetadataCallback implements NetResultCallback, WebSocke
                         }
                     }
                 }
-                if (baseResponse4 != null && (list = (List) baseResponse4.getData()) != null) {
+                if (baseResponse4 != null
+                        && (list = (List<VideoPvModel>) baseResponse4.getData()) != null
+                        && !list.isEmpty()) {
                     eVar4.f12287c = list;
                     // Search and dynamic feeds omit cid. Resolve it from the page list before
                     // requesting a stream, while preserving a selected/history page's cid.
                     if (eVar4.video != null && eVar4.video.getCid() <= 0)
-                        for (Object entry : list) {
-                            long cid = ((VideoPvModel) entry).getCid();
+                        for (VideoPvModel entry : list) {
+                            long cid = entry.getCid();
                             if (cid > 0) {
                                 eVar4.video.setCid(cid);
                                 break;
@@ -279,7 +281,7 @@ public final class PlayerMetadataCallback implements NetResultCallback, WebSocke
                         }
                     PlaybackFragment uVar9 = (PlaybackFragment) eVar4.fragmentReference.get();
                     if (uVar9 != null) {
-                        uVar9.p0();
+                        uVar9.updateEpisodeHeader();
                     }
                 }
                 if (eVar4.video == null || eVar4.video.getCid() <= 0) {

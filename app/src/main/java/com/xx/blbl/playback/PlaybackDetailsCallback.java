@@ -37,11 +37,13 @@ public final class PlaybackDetailsCallback implements NetResultCallback {
     public final /* synthetic */ PlaybackCoordinator f12259b;
 
     private final long requestCid;
+    private final VideoModel requestedVideo;
 
     public /* synthetic */ PlaybackDetailsCallback(PlaybackCoordinator eVar, int i4) {
         this.f12258a = i4;
         this.f12259b = eVar;
-        this.requestCid = eVar.video == null ? 0 : eVar.video.getCid();
+        this.requestedVideo = eVar.video;
+        this.requestCid = requestedVideo == null ? 0 : requestedVideo.getCid();
     }
 
     private final void a(Throwable th) {}
@@ -68,6 +70,7 @@ public final class PlaybackDetailsCallback implements NetResultCallback {
                 }
                 break;
             case 4:
+                if (this.f12259b.video != requestedVideo) break;
                 PlaybackFragment uVar3 = (PlaybackFragment) this.f12259b.fragmentReference.get();
                 if (uVar3 != null) {
                     uVar3.m0(false);
@@ -210,6 +213,7 @@ public final class PlaybackDetailsCallback implements NetResultCallback {
             case 4:
                 BaseResponse baseResponse3 = (BaseResponse) obj;
                 PlaybackCoordinator eVar5 = this.f12259b;
+                if (eVar5.video != requestedVideo) break;
                 if (baseResponse3 != null
                         && (videoDetailModel = (VideoDetailModel) baseResponse3.getData())
                                 != null) {
@@ -245,6 +249,9 @@ public final class PlaybackDetailsCallback implements NetResultCallback {
                     String mid = null;
                     jVar3 = null;
                     if (view != null) {
+                        if (eVar5.videoParts().isEmpty() && view.getPages() != null) {
+                            eVar5.f12287c = view.getPages();
+                        }
                         UgcSeriesModel ugc_season = view.getUgc_season();
                         if (ugc_season != null
                                 && (sections = ugc_season.getSections()) != null
@@ -267,21 +274,10 @@ public final class PlaybackDetailsCallback implements NetResultCallback {
                         if (videoModel5 != null) {
                             videoModel5.setDesc(view.getDesc());
                         }
-                        int i7 = eVar5.f12278V;
-                        WeakReference weakReference3 = eVar5.fragmentReference;
-                        if (i7 == 0) {
-                            PlaybackFragment uVar12 = (PlaybackFragment) weakReference3.get();
-                            if (uVar12 != null) {
-                                uVar12.p0();
-                            }
-                        } else {
-                            PlaybackFragment uVar13 = (PlaybackFragment) weakReference3.get();
-                            if (uVar13 != null) {
-                                uVar13.o0();
-                            }
-                        }
-                        PlaybackFragment uVar14 = (PlaybackFragment) weakReference3.get();
+                        PlaybackFragment uVar14 =
+                                (PlaybackFragment) eVar5.fragmentReference.get();
                         if (uVar14 != null) {
+                            uVar14.updateEpisodeHeader();
                             z7 = false;
                             VideoModel videoModel6 = eVar5.video;
                             if ((videoModel6 != null ? videoModel6.getOwner() : null) != null) {

@@ -6,8 +6,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
+import android.widget.TextView;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -215,6 +223,10 @@ public final class ExtendedPlaybackProbe extends Instrumentation {
     private Object openVideo(String bvid) throws Exception {
         Object detail = api("getVideoDetail", null, bvid);
         Object model = call(detail, "getView");
+        return openVideoModel(model);
+    }
+
+    private Object openVideoModel(Object model) throws Exception {
         check(model != null, "actual video metadata");
         open(model);
         playing(500);
@@ -410,6 +422,86 @@ public final class ExtendedPlaybackProbe extends Instrumentation {
             awaitCid(state, (Long) call(pages.get(2), "getCid"));
         } finally {
             main(() -> app.getClass().getField("continuationMode").setInt(app, original));
+        }
+    }
+
+    private void s16MultipartCollection() throws Exception {
+        String bvid = "BV15es76gEgL";
+        long first = 43611326038L, second = 43611851876L;
+        HttpURLConnection request = (HttpURLConnection)
+                new URL("https://api.bilibili.com/x/web-interface/view?bvid=" + bvid)
+                        .openConnection();
+        request.setConnectTimeout(10000);
+        request.setReadTimeout(10000);
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(request.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) response.append(line);
+        } finally {
+            request.disconnect();
+        }
+        JSONObject detail = new JSONObject(response.toString());
+        check(detail.getInt("code") == 0, "official S16 replay metadata available");
+        Object gson = loader.loadClass("com.google.gson.Gson").getConstructor().newInstance();
+        Object model = call(gson, "fromJson", detail.getJSONObject("data").toString(),
+                loader.loadClass("com.xx.blbl.model.video.VideoModel"));
+        Object state = openVideoModel(model);
+        List<?> collection = (List<?>) call(state, "collectionEpisodes");
+        check(collection.size() > 1
+                        && "BV1TgWp6MEHJ".equals(call(collection.get(1), "getBvid")),
+                "BLG vs T1 follows the final in the same collection");
+        check(((Long) call(field(state, "video"), "getCid")) == first,
+                "final starts at game one");
+
+        click("button_choose_episode");
+        View root = awaitDialog("top_title");
+        View recycler = root.findViewById(id("recyclerView"));
+        awaitFocus(recycler);
+        key(19);
+        check(root.findFocus().getId() == id("button_more_info"),
+                "DPAD up reaches the collection toggle");
+        key(23);
+        awaitFocus(recycler);
+        check(((TextView) recycler.findFocus().findViewById(id("text_title")))
+                        .getText().toString().contains("GEN vs BLG"),
+                "collection opens on the current match");
+        key(19);
+        key(23);
+        awaitFocus(recycler);
+        check(
+                "第一局".contentEquals(
+                        ((TextView) recycler.findFocus().findViewById(id("text_title"))).getText()),
+                "chooser opens on game one");
+        key(22);
+        check(
+                "第二局".contentEquals(
+                        ((TextView) recycler.findFocus().findViewById(id("text_title"))).getText()),
+                "DPAD right focuses game two");
+        key(23);
+        awaitCid(state, second);
+
+        click("button_choose_episode");
+        root = awaitDialog("top_title");
+        recycler = root.findViewById(id("recyclerView"));
+        awaitFocus(recycler);
+        key(21);
+        key(23);
+        awaitCid(state, first);
+
+        Object app = field(fragment, "appState");
+        Field continuation = app.getClass().getField("continuationMode");
+        int original = continuation.getInt(app);
+        try {
+            main(() -> {
+                continuation.setInt(app, 3);
+                call(field(fragment, "player"), "seekTo", snapshotDuration() - 700);
+            });
+            awaitCid(state, second);
+            check(bvid.equals(call(field(state, "video"), "getBvid")),
+                    "game one ends and game two plays within the same match");
+        } finally {
+            main(() -> continuation.setInt(app, original));
         }
     }
 
@@ -876,6 +968,7 @@ public final class ExtendedPlaybackProbe extends Instrumentation {
             fragmentType = loader.loadClass("com.xx.blbl.ui.playback.PlaybackFragment");
             selected("subtitles", this::subtitles);
             selected("multipart", this::multipart);
+            selected("s16-multipart-collection", this::s16MultipartCollection);
             selected("series", this::series);
             selected("interactive", this::interactive);
             selected("dialogs", this::dialogs);

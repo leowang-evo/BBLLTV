@@ -185,7 +185,7 @@ public final class PlaybackMetadataCallback implements NetResultCallback {
                 }
                 PlaybackFragment uVar = (PlaybackFragment) eVar2.fragmentReference.get();
                 if (uVar != null) {
-                    uVar.o0();
+                    uVar.updateEpisodeHeader();
                 }
                 eVar2.loadCurrentMedia();
                 break;

@@ -15,7 +15,7 @@ def main():
     parser.add_argument('--device',default='emulator-5566')
     parser.add_argument('--apk',type=pathlib.Path,default=ROOT/'app/build/outputs/apk/debug/app-debug.apk')
     parser.add_argument('--pgc-diagnostic',action='store_true',help='Compare the official PGC request versions without exporting cookies or stream URLs')
-    parser.add_argument('--case',choices=['subtitles','multipart','series','interactive','dialogs','highProfiles','continuation','specialProfiles','lifecycle'])
+    parser.add_argument('--case',choices=['subtitles','multipart','s16-multipart-collection','series','interactive','dialogs','highProfiles','continuation','specialProfiles','lifecycle'])
     parser.add_argument('--extended',action='store_true',help='Test actual subtitles, multi-part continuation, interactive branches and dialogs')
     parser.add_argument('--refresh-navigation',action='store_true',help='Check incremental list updates, shallow menus and linear playback Back using real media')
     parser.add_argument('--home-ux', action='store_true', help='Check home focus, per-account local history, and real resume playback using the existing login; viewing history may update')
